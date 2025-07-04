@@ -9,9 +9,12 @@ import SwiftUI
 import SwiftData
 
 @MainActor
-final class UserDetailViewModel: ObservableObject, UserDetailViewModelProtocol {
+final class UserDetailViewModel: ObservableObject, UserDetailViewModelProtocol, ErrorHandling {
     let user: User
     @Published var isFavorite: Bool = false
+    @Published var showAlert: Bool = false
+    @Published var alertContent: CustomAlertView?
+    
     
     private let favoriteManager: FavoriteManagerProtocol
     
@@ -28,10 +31,27 @@ final class UserDetailViewModel: ObservableObject, UserDetailViewModelProtocol {
     func toggleFavorite() {
         Task {
             do {
+                let wasFavorite = isFavorite
                 try await favoriteManager.toggleFavorite(for: user)
                 await loadFavoriteStatus()
+                
+                // Show success message
+                if wasFavorite {
+                    ToastManager.shared.showInfo(
+                        title: "Kaldırıldı",
+                        message: "Kullanıcı favorilerden kaldırıldı"
+                    )
+                } else {
+                    ToastManager.shared.showSuccess(
+                        title: "Eklendi",
+                        message: "Kullanıcı favorilere eklendi"
+                    )
+                }
+                
             } catch {
                 LogManager.shared.error("Failed to toggle favorite: \(error)")
+                handleError(error,
+                            defaultMessage: DefaultErrorStrings.unexpectedFavoriteError.value)
             }
         }
     }

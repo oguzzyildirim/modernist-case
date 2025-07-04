@@ -8,11 +8,15 @@
 import SwiftUI
 import Combine
 
-final class HomeViewModel: ObservableObject, HomeViewModelProtocol {
+@MainActor
+final class HomeViewModel: ObservableObject, HomeViewModelProtocol, ErrorHandling {
     let repo: HomeRepositoryProtocol
     @Published var searchText: String = ""
     @Published var users: [User] = []
     @Published var filteredUsers: [User] = []
+    @Published var showAlert: Bool = false
+    @Published var alertContent: CustomAlertView?
+    @Published var isLoading: Bool = false
     
     private var cancellables = Set<AnyCancellable>()
     
@@ -35,8 +39,20 @@ final class HomeViewModel: ObservableObject, HomeViewModelProtocol {
     /// 2. Handles success and error cases
     /// 3. Updates both the users and filteredUsers properties on success
     func getUsers() {
+        isLoading = true
+        
         repo.getUsers()
-            .sink(receiveCompletion: { completion in
+            .sink(receiveCompletion: { [weak self] completion in
+                self?.isLoading = false
+                
+                switch completion {
+                case .finished:
+                    break
+                case .failure(let error):
+                    LogManager.shared.error("Failed to fetch users: \(error)")
+                    self?.handleError(error,
+                                      defaultMessage: DefaultErrorStrings.failedToLoadUsers.value)
+                }
             }, receiveValue: { [weak self] users in
                 guard let self = self, let users = users else { return }
                 self.users = users

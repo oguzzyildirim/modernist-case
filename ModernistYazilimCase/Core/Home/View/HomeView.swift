@@ -20,25 +20,49 @@ struct HomeView: View {
                     headerView
                         .background(Color.background)
                     SearchBarView(searchText: $viewModel.searchText)
-                    ScrollView{
-                        LazyVGrid(columns: [GridItem(.flexible())], spacing: 12) {
-                            ForEach(viewModel.filteredUsers, id: \.id) { user in
-                                UserCardView(user: user,
-                                             width: width * 0.85,
-                                             height: height * 0.25)
-                                .onTapGesture {
-                                    router.show(.userDetail(user), animated: true)
+                    
+                    if viewModel.isLoading {
+                        Spacer()
+                        ProgressView()
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .progressViewStyle(CircularProgressViewStyle(tint: Color.accent))
+                        Spacer()
+                    } else {
+                        ScrollView{
+                            LazyVGrid(columns: [GridItem(.flexible())], spacing: 12) {
+                                ForEach(viewModel.filteredUsers, id: \.id) { user in
+                                    UserCardView(user: user,
+                                                 width: width * 0.85,
+                                                 height: height * 0.25)
+                                    .onTapGesture {
+                                        router.show(.userDetail(user), animated: true)
+                                    }
                                 }
                             }
                         }
+                        .scrollIndicators(.hidden)
                     }
-                    .scrollIndicators(.hidden)
                 }
             }
             .onAppear {
                 viewModel.onAppear()
             }
-            
+            .overlay(
+                Group {
+                    if viewModel.showAlert, let alertContent = viewModel.alertContent {
+                        ZStack {
+                            Color.black.opacity(0.3)
+                                .ignoresSafeArea()
+                                .onTapGesture {
+                                    viewModel.showAlert = false
+                                }
+                            
+                            alertContent
+                        }
+                        .animation(.easeInOut(duration: 0.3), value: viewModel.showAlert)
+                    }
+                }
+            )
         }
     }
     

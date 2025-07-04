@@ -123,22 +123,4 @@ final class FavoriteManager: FavoriteManagerProtocol {
             throw FavoriteError.databaseError(error)
         }
     }
-}
-
-// MARK: - FavoriteError
-enum FavoriteError: LocalizedError {
-    case invalidUserID
-    case databaseError(Error)
-    case userNotFound
-    
-    var errorDescription: String? {
-        switch self {
-        case .invalidUserID:
-            return "Invalid user ID"
-        case .databaseError(let error):
-            return "Database error: \(error.localizedDescription)"
-        case .userNotFound:
-            return "User not found"
-        }
-    }
 } 

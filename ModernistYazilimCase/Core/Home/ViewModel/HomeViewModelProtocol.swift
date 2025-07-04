@@ -7,6 +7,7 @@
 
 import Foundation
 
+@MainActor
 protocol HomeViewModelProtocol: AnyObject {
     // Properties
     var users: [User] { get }

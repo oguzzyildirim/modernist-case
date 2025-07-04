@@ -7,11 +7,13 @@
 
 import Foundation
 
-protocol FavoritesViewModelProtocol: AnyObject {
+@MainActor
+protocol FavoritesViewModelProtocol: ObservableObject, ErrorHandling {
+    // MARK: - State
     var favoriteUsers: [User] { get }
     var isLoading: Bool { get }
-    var errorMessage: String? { get }
     
+    // MARK: - Actions
     func onAppear()
     func refreshFavorites()
     func removeFavorite(user: User)

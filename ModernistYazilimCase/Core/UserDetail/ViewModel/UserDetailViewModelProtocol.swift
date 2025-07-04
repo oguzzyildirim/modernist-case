@@ -7,6 +7,7 @@
 
 import Foundation
 
+@MainActor
 protocol UserDetailViewModelProtocol: AnyObject {
     var user: User { get }
     var isFavorite: Bool { get }

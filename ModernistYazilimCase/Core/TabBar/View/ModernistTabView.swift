@@ -32,8 +32,6 @@ struct ModernistTabView: View {
         .background(
             RoundedRectangle(cornerRadius: 24)
         )
-        .onChange(of: currentTab) { tab in
-        }
     }
 }
 

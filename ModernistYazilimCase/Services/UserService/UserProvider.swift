@@ -35,8 +35,6 @@ extension UserProvider: APIEndpoint {
         switch self {
         case .users:
             return ["Content-Type": "application/json"]
-        default:
-            return ["Content-Type": "application/json"]
         }
     }
     

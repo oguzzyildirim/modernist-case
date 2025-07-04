@@ -39,6 +39,23 @@ struct UserDetailView: View {
             .padding()
         }
         .background(Color.background)
+        .toast(ToastManager.shared)
+        .overlay(
+            Group {
+                if viewModel.showAlert, let alertContent = viewModel.alertContent {
+                    ZStack {
+                        Color.black.opacity(0.3)
+                            .ignoresSafeArea()
+                            .onTapGesture {
+                                viewModel.showAlert = false
+                            }
+                        
+                        alertContent
+                    }
+                    .animation(.easeInOut(duration: 0.3), value: viewModel.showAlert)
+                }
+            }
+        )
     }
     
     // MARK: - Profile Section

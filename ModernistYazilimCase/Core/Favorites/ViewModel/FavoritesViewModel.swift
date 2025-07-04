@@ -8,12 +8,12 @@
 import SwiftUI
 
 @MainActor
-final class FavoritesViewModel: ObservableObject, FavoritesViewModelProtocol {
-    
+final class FavoritesViewModel: ObservableObject, FavoritesViewModelProtocol, ErrorHandling {
     // MARK: - Published Properties
     @Published var favoriteUsers: [User] = []
     @Published var isLoading: Bool = false
-    @Published var errorMessage: String? = nil
+    @Published var showAlert: Bool = false
+    @Published var alertContent: CustomAlertView?
     
     // MARK: - Private Properties
     private let favoriteManager: FavoriteManagerProtocol
@@ -42,6 +42,10 @@ final class FavoritesViewModel: ObservableObject, FavoritesViewModelProtocol {
     func removeFavorite(user: User) {
         guard let userID = user.id else {
             LogManager.shared.error("Invalid user ID for removal")
+            handleError(
+                FavoriteError.invalidUserID,
+                defaultMessage: DefaultErrorStrings.invalidCredentials.value
+            )
             return
         }
         
@@ -50,11 +54,16 @@ final class FavoritesViewModel: ObservableObject, FavoritesViewModelProtocol {
                 try await favoriteManager.removeFavorite(userID: userID)
                 await loadFavoriteUsers() // Refresh the list
                 LogManager.shared.info("User \(userID) removed from favorites")
+                
+                // Show success toast
+                ToastManager.shared.showInfo(
+                    title: "Kaldırıldı",
+                    message: "Kullanıcı favorilerden kaldırıldı"
+                )
+                
             } catch {
-                LogManager.shared.error("Failed to remove favorite: \(error)")
-                await MainActor.run {
-                    self.errorMessage = "Favoriden kaldırılamadı: \(error.localizedDescription)"
-                }
+                handleError(error,
+                            defaultMessage: DefaultErrorStrings.failedToRemoveFromFavorites.value)
             }
         }
     }
@@ -63,28 +72,18 @@ final class FavoritesViewModel: ObservableObject, FavoritesViewModelProtocol {
     
     /// Loads favorite users from the database
     private func loadFavoriteUsers() async {
-        await MainActor.run {
-            self.isLoading = true
-            self.errorMessage = nil
-        }
+        isLoading = true
         
         do {
             let favorites = try await favoriteManager.getFavoriteUsers()
-            
-            await MainActor.run {
-                self.favoriteUsers = favorites
-                self.isLoading = false
-            }
-            
+            favoriteUsers = favorites
+            isLoading = false
             LogManager.shared.info("Loaded \(favorites.count) favorite users")
             
         } catch {
-            LogManager.shared.error("Failed to load favorite users: \(error)")
-            
-            await MainActor.run {
-                self.errorMessage = "Favoriler yüklenemedi: \(error.localizedDescription)"
-                self.isLoading = false
-            }
+            isLoading = false
+            handleError(error,
+                        defaultMessage: DefaultErrorStrings.failedToLoadFavorites.value)
         }
     }
 }
