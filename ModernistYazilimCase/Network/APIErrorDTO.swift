@@ -17,11 +17,10 @@ struct APIErrorDTO: Codable {
     let errorItems: [String: String]?
 }
 
-enum APIErrorHandler: Error {
+enum APIErrorHandler: AppError {
     case customApiError(APIErrorDTO)
     case requestFailed
     case normalError(Error)
-    case tokenExpired
     case decodingError(Error)
     case emptyErrorWithStatusCode(String)
 
@@ -45,21 +44,23 @@ enum APIErrorHandler: Error {
             }
             if errorItems == nil && apiErrorDTO.code == nil &&
                 apiErrorDTO.message == nil {
-                errorItems = "Internal error!"
+                errorItems = "Sunucu hatası!"
             }
             return String(format: "%@ %@ \n %@", apiErrorDTO.code ?? "",
                           apiErrorDTO.message ?? "", errorItems ?? "")
             
         case .requestFailed:
-            return "request failed"
+            return "İstek başarısız oldu"
         case .normalError(let error):
             return error.localizedDescription
-        case .tokenExpired:
-            return "Token problems"
         case .decodingError(let error):
-            return "Decoding error: \(error.localizedDescription)"
+            return "Veri çözümleme hatası: \(error.localizedDescription)"
         case .emptyErrorWithStatusCode(let status):
-            return status
+            return "Sunucu hatası: \(status)"
         }
+    }
+    
+    var alertTitle: String {
+        return "Ağ Hatası"
     }
 }

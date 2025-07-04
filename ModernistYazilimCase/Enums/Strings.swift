@@ -10,6 +10,7 @@ import Foundation
 
 typealias HomeStrings = Strings.HomeStrings
 typealias UserDetailStrings = Strings.UserDetailStrings
+typealias DefaultErrorStrings = Strings.DefaultErrorStrings
 
 enum Strings {
     enum HomeStrings {
@@ -42,6 +43,29 @@ enum Strings {
                 return "Adres"
             case .companyTitle:
                 return "Şirket"
+            }
+        }
+    }
+    
+    enum DefaultErrorStrings {
+        case invalidCredentials
+        case failedToRemoveFromFavorites
+        case failedToLoadFavorites
+        case failedToLoadUsers
+        case unexpectedFavoriteError
+        
+        var value: String {
+            switch self {
+            case .invalidCredentials:
+                return "Geçersiz kullanıcı kimliği"
+            case .failedToRemoveFromFavorites:
+                return "Favoriden kaldırılamadı"
+            case .failedToLoadFavorites:
+                return "Favoriler yüklenemedi"
+            case .failedToLoadUsers:
+                return "Kullanıcılar yüklenirken bir hata oluştu. Lütfen tekrar deneyin."
+            case .unexpectedFavoriteError:
+                return "Favori işlemi sırasında beklenmedik bir hata oluştu"
             }
         }
     }
