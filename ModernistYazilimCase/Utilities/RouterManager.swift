@@ -11,6 +11,7 @@ import SwiftData
 protocol RouterProtocol: ObservableObject {
     
     var navigationController: ModernistNavigationController { get }
+    @MainActor var modelContext: ModelContext { get }
     
     func setModelContainer(_ container: ModelContainer)
     func start()
@@ -32,6 +33,15 @@ final class RouterManager: RouterProtocol {
     
     private var modelContainer: ModelContainer?
     
+    // MARK: - Public Properties
+    @MainActor
+    var modelContext: ModelContext {
+        guard let container = modelContainer else {
+            fatalError("Model container not set. Call setModelContainer() first.")
+        }
+        return container.mainContext
+    }
+    
     private init() {}
     
     func setModelContainer(_ container: ModelContainer) {
@@ -39,7 +49,7 @@ final class RouterManager: RouterProtocol {
     }
     
     func start() {
-        show(.contentView, animated: true)
+        show(.splash, animated: true)
     }
     
     func show(_ route: Route, animated: Bool) {
