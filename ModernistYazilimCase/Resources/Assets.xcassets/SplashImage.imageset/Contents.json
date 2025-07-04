@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "modernist-yazilim.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
