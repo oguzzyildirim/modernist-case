@@ -8,7 +8,7 @@
 import Foundation
 
 @MainActor
-protocol FavoritesViewModelProtocol: ObservableObject, ErrorHandling {
+protocol FavoritesViewModelProtocol: AnyObject, ErrorHandling {
     // MARK: - State
     var favoriteUsers: [User] { get }
     var isLoading: Bool { get }
