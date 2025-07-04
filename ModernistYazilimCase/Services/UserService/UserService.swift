@@ -7,7 +7,6 @@
 
 import Foundation
 import Combine
-import AVFoundation
 
 protocol UserServiceProtocol: AnyObject {
     func getUsers() -> AnyPublisher<[User]?, Error>

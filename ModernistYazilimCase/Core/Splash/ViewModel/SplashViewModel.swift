@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@MainActor
 final class SplashViewModel: ObservableObject {
     @AppStorage(StaticKeys.currentTab.key) private var currentTab: Int = TabBarItems.home.value
     
@@ -19,9 +20,7 @@ final class SplashViewModel: ObservableObject {
     }
     
     func showTabBarView() {
-        DispatchQueue.main.async {
-            self.currentTab = TabBarItems.home.value
-            RouterManager.shared.show(.tabBar, animated: false)
-        }
+        self.currentTab = TabBarItems.home.value
+        RouterManager.shared.show(.tabBar, animated: false)
     }
 }
